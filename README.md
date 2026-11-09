@@ -1,5 +1,7 @@
 # Triagebook
 
+[![CI](https://github.com/aishwaryr/triagebook/actions/workflows/ci.yml/badge.svg)](https://github.com/aishwaryr/triagebook/actions/workflows/ci.yml)
+
 An issue tracker and a team wiki in one app. Triage the work, and keep the docs next to the issues they explain.
 
 **Live demo:** https://triagebook.vercel.app
@@ -16,6 +18,7 @@ Click **Try Demo** on the sign-in page, no account needed. (Or sign in with `dem
 - **Wiki:** markdown pages with tables, code and lists, at readable URLs like `/wiki/release-process`.
 - **Issues ↔ wiki links:** an issue lists the pages that explain it, and a page lists its issues.
 - **Auth:** email and password sign-up and sign-in, with every app page behind a session check.
+- **Theme:** light, dark or system, saved in a cookie so the server renders the right theme with no flash.
 
 ## Tech stack
 
@@ -26,7 +29,7 @@ Click **Try Demo** on the sign-in page, no account needed. (Or sign in with `dem
 | UI | Tailwind CSS v4, shadcn/ui (Radix), Lucide icons, Geist |
 | Data | Neon Postgres, Drizzle ORM, Drizzle Kit migrations |
 | Validation | Zod |
-| Testing | Playwright end-to-end tests, one spec per feature, run against a production build |
+| Testing | Playwright end-to-end tests, one spec per feature, run against a production build in GitHub Actions |
 | Hosting | Vercel, in the same region as the database |
 
 ## Architecture
@@ -85,3 +88,5 @@ npx playwright test tests/e2e/signin.spec.ts   # one feature
 ```
 
 Specs live in `tests/e2e/`, one per feature. Playwright builds the app and serves it on port 3100, so the dev server on port 3000 can keep running. `tests/e2e/global-setup.ts` seeds the test accounts before each run.
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint and the full Playwright suite on every pull request and every push to `master`, against a Neon branch kept for CI. It needs a `DATABASE_URL` repository secret.
