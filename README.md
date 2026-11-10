@@ -18,7 +18,7 @@ Click **Try Demo** on the sign-in page, no account needed. (Or sign in with `dem
 - **Wiki:** markdown pages with tables, code and lists, at readable URLs like `/wiki/release-process`.
 - **Issues ↔ wiki links:** an issue lists the pages that explain it, and a page lists its issues.
 - **Auth:** email and password sign-up and sign-in, with every app page behind a session check.
-- **Theme:** light, dark or system, saved in a cookie so the server renders the right theme with no flash.
+- **Theme:** starts dark; a navbar button switches between dark and light (not saved).
 
 ## Tech stack
 

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { cookies } from "next/headers";
 import { LogOut } from "lucide-react";
 
 import { signOut } from "@/app/actions/auth";
@@ -8,12 +7,10 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { UserAvatar } from "@/components/user-avatar";
 import { getCurrentUser } from "@/lib/dal";
-import { parseTheme, THEME_COOKIE } from "@/lib/theme";
 import { NavLinks } from "./nav-links";
 
 export async function Navbar() {
   const user = await getCurrentUser();
-  const theme = parseTheme((await cookies()).get(THEME_COOKIE)?.value);
 
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-md">
@@ -30,7 +27,7 @@ export async function Navbar() {
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             {/* sm and up only: at 320px the row is full (logo, links, avatar, log-out). */}
             <div className="hidden sm:flex">
-              <ThemeToggle initialTheme={theme} />
+              <ThemeToggle />
             </div>
             <span className="flex items-center gap-2 text-sm text-muted-foreground">
               <UserAvatar name={user.name} />

@@ -58,8 +58,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* The root layout sets .dark from the theme cookie; for "system", lib/theme.ts's
-   inline script sets it from the OS setting. */
+/* The root layout always sets .dark; the navbar's ThemeToggle removes it for light. */
 .dark {
   color-scheme: dark;
   --background: #0f1013;
