@@ -19,6 +19,7 @@ Click **Try Demo** on the sign-in page, no account needed. (Or sign in with `dem
 - **Issues ↔ wiki links:** an issue lists the pages that explain it, and a page lists its issues.
 - **Auth:** email and password sign-up and sign-in, with every app page behind a session check.
 - **Theme:** starts dark; a navbar button switches between dark and light (not saved).
+- **Accessible forms:** checked with axe (WCAG 2.1 AA) and keyboard-only tests; after a failed submit, focus moves to the first error. Works down to 320px phones.
 
 ## Tech stack
 
@@ -63,8 +64,10 @@ flowchart LR
 ## Roadmap
 
 - **AI features:** turn a pasted Slack thread or email into issue drafts to review; priority suggestions with a reason; related issues and pages through Postgres full-text search; and answers from the wiki with citations.
-- **Mobile layout** across the app, and an accessibility pass over all forms.
+- **Caching:** Cache Components with tagged dashboard reads, invalidated by the issue actions.
 - **Rate limiting** on sign-in and sign-up.
+- **Pagination** for the issue and wiki lists.
+- **Accessibility beyond forms:** the dashboard, lists and menus.
 
 ## Run locally
 
