@@ -199,3 +199,50 @@ export const issueCommentsRelations = relations(issueComments, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// AI calls — one row per model call: the usage log and the source of the daily quotas
+
+export const aiFeature = pgEnum("ai_feature", ["bulk_issues", "triage"]);
+
+export const aiCallStatus = pgEnum("ai_call_status", [
+  "pending", // reserved before the model call; counts toward the quota
+  "ok",
+  "error", // provider error, timeout or output that failed the schema
+  "rejected", // over a daily quota; the model was never called
+]);
+
+export const aiCalls = pgTable(
+  "ai_calls",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    // Cascade: usage rows mean nothing once their user is deleted.
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    feature: aiFeature("feature").notNull(),
+    model: varchar("model", { length: 100 }).notNull(),
+    // Bumped when a prompt or schema changes, so results can be compared per version.
+    promptVersion: varchar("prompt_version", { length: 40 }).notNull(),
+    status: aiCallStatus("status").default("pending").notNull(),
+    // Short machine code only (e.g. "timeout"); never the prompt or the provider body.
+    errorCode: varchar("error_code", { length: 40 }),
+    inputTokens: integer("input_tokens"),
+    outputTokens: integer("output_tokens"),
+    latencyMs: integer("latency_ms"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    // Serve the per-user and app-wide "calls today" counts.
+    index("ai_calls_user_id_created_at_idx").on(table.userId, table.createdAt),
+    index("ai_calls_created_at_idx").on(table.createdAt),
+  ],
+);
+
+export const aiCallsRelations = relations(aiCalls, ({ one }) => ({
+  user: one(users, {
+    fields: [aiCalls.userId],
+    references: [users.id],
+  }),
+}));

@@ -15,7 +15,9 @@
     "demo:reset": "bash scripts/reset-demo.sh"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^4.0.85",
     "@neondatabase/serverless": "^1.1.0",
+    "ai": "^7.0.176",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.3.0",

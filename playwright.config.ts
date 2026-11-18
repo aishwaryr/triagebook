@@ -23,7 +23,9 @@ export default defineConfig({
   // A production build, not `next dev`: no compile on first hit and no Fast Refresh
   // reloads from parallel tests, so results don't depend on what dev compiled before.
   webServer: {
-    command: `npm run build && npm run start -- --port ${PORT}`,
+    // AI_MOCK=1: AI features answer from a mock model (lib/ai-server.ts), so specs
+    // never call Groq, never spend its free quota, and get the same answer every run.
+    command: `npm run build && AI_MOCK=1 npm run start -- --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: false,
     timeout: 180_000,
