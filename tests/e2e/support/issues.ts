@@ -49,6 +49,6 @@ export async function choose(
   field: "Status" | "Priority",
   option: string,
 ) {
-  await page.getByLabel(field).click();
+  await page.getByRole("combobox", { name: field }).click();
   await page.getByRole("option", { name: option, exact: true }).click();
 }

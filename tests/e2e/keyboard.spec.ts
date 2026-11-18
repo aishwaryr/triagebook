@@ -12,6 +12,11 @@ test.afterAll(async () => {
   await deleteWikiPages(TITLE_PREFIX);
 });
 
+/** A form field by id, skipping copies on hidden routes (cacheComponents keeps them mounted). */
+function field(page: Page, id: string) {
+  return page.locator(`#${id}`).filter({ visible: true });
+}
+
 /** Presses Tab until `target` has focus; fails if it isn't reachable in `max` presses. */
 async function tabTo(page: Page, target: Locator, max = 40) {
   await expect(target).toBeVisible();
@@ -52,8 +57,8 @@ test("sign in, create and edit an issue, and comment, by keyboard only", async (
 
   const title = `${TITLE_PREFIX} ${Date.now().toString(36)}`;
   await page.goto("/issues/new");
-  await typeInto(page, page.locator("#title"), title);
-  await typeInto(page, page.locator("#description"), "Typed, not pasted");
+  await typeInto(page, field(page, "title"), title);
+  await typeInto(page, field(page, "description"), "Typed, not pasted");
 
   // Radix select: Enter opens it on the current value, ArrowDown moves, Enter picks.
   await activate(page, page.getByRole("combobox", { name: "Status" }));
@@ -69,7 +74,7 @@ test("sign in, create and edit an issue, and comment, by keyboard only", async (
   await expect(page.getByRole("heading", { name: title })).toBeVisible();
 
   await activate(page, page.getByRole("link", { name: "Edit" }));
-  await typeInto(page, page.locator("#title"), `${title} edited`);
+  await typeInto(page, field(page, "title"), `${title} edited`);
   await activate(page, page.getByRole("button", { name: "Save changes" }));
   await expect(
     page.getByRole("heading", { name: `${title} edited` }),
@@ -87,8 +92,8 @@ test("create a wiki page by keyboard only", async ({ page }) => {
 
   const title = `${TITLE_PREFIX} ${Date.now().toString(36)}`;
   await page.goto("/wiki/new");
-  await typeInto(page, page.locator("#title"), title);
-  await typeInto(page, page.locator("#body"), "# Typed page");
+  await typeInto(page, field(page, "title"), title);
+  await typeInto(page, field(page, "body"), "# Typed page");
   await activate(page, page.getByRole("button", { name: "Create page" }));
   await expect(
     page.getByRole("heading", { level: 1, name: title }),
@@ -121,14 +126,14 @@ test.describe("a failed submit moves focus to the problem", () => {
     await keyboardSignIn(page);
 
     await page.goto("/issues/new");
-    await typeInto(page, page.locator("#title"), "   ");
+    await typeInto(page, field(page, "title"), "   ");
     await activate(page, page.getByRole("button", { name: "Create issue" }));
     await expect(page.locator("#title-error")).toBeVisible();
-    await expect(page.locator("#title")).toBeFocused();
+    await expect(field(page, "title")).toBeFocused();
 
     // A real issue to comment on.
     const title = `${TITLE_PREFIX} ${Date.now().toString(36)}`;
-    await typeInto(page, page.locator("#title"), title);
+    await typeInto(page, field(page, "title"), title);
     await activate(page, page.getByRole("button", { name: "Create issue" }));
     await expect(page.getByRole("heading", { name: title })).toBeVisible();
     await typeInto(page, page.getByLabel("Add a comment"), "   ");
@@ -137,9 +142,9 @@ test.describe("a failed submit moves focus to the problem", () => {
     await expect(page.getByLabel("Add a comment")).toBeFocused();
 
     await page.goto("/wiki/new");
-    await typeInto(page, page.locator("#title"), "   ");
+    await typeInto(page, field(page, "title"), "   ");
     await activate(page, page.getByRole("button", { name: "Create page" }));
     await expect(page.locator("#title-error")).toBeVisible();
-    await expect(page.locator("#title")).toBeFocused();
+    await expect(field(page, "title")).toBeFocused();
   });
 });

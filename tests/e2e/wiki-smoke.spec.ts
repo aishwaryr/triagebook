@@ -28,8 +28,8 @@ test("create → list → view → edit → link to an issue → delete", async 
   await page.getByRole("link", { name: "Wiki", exact: true }).click();
   await expectPath(page, "/wiki");
   await page.getByRole("link", { name: "New page" }).first().click();
-  await page.getByLabel("Title").fill(title);
-  await page.getByLabel("Content").fill("First **draft**");
+  await page.getByRole("textbox", { name: "Title" }).fill(title);
+  await page.getByRole("textbox", { name: "Content" }).fill("First **draft**");
   await page.getByRole("button", { name: "Create page" }).click();
   await expectPath(page, url);
   await expect(page.locator("article strong")).toHaveText("draft");
@@ -44,7 +44,9 @@ test("create → list → view → edit → link to an issue → delete", async 
   await page.getByRole("link", { name: title }).click();
   await expectPath(page, url);
   await page.getByRole("link", { name: "Edit" }).click();
-  await page.getByLabel("Content").fill("## Final\n\nReviewed");
+  await page
+    .getByRole("textbox", { name: "Content" })
+    .fill("## Final\n\nReviewed");
   await page.getByRole("button", { name: "Save changes" }).click();
   await expectPath(page, url);
   await expect(

@@ -69,7 +69,10 @@ export default async function EditIssuePage({
         </CardHeader>
 
         <CardContent>
+          {/* cacheComponents keeps this route mounted while hidden; a new updatedAt
+              remounts the form, so a reopened edit shows the saved values. */}
           <IssueForm
+            key={issue.updatedAt.toISOString()}
             action={updateIssueWithId}
             initialValues={initialValues}
             users={users}

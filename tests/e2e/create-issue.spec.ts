@@ -21,8 +21,10 @@ test("creates an issue, opens it, and shows it in the list", async ({
 }) => {
   const title = `${TITLE_PREFIX} ${Date.now().toString(36)}`;
 
-  await page.getByLabel("Title").fill(title);
-  await page.getByLabel("Description").fill("Created by Playwright");
+  await page.getByRole("textbox", { name: "Title" }).fill(title);
+  await page
+    .getByRole("textbox", { name: "Description" })
+    .fill("Created by Playwright");
   await choose(page, "Status", "Todo");
   await choose(page, "Priority", "High");
   await page.getByRole("button", { name: "Create issue" }).click();
@@ -32,12 +34,12 @@ test("creates an issue, opens it, and shows it in the list", async ({
 
   await page.getByRole("link", { name: "← All issues" }).click();
   await expectPath(page, "/issues");
-  await expect(page.getByText(title)).toBeVisible();
+  await expect(page.getByRole("link", { name: title })).toBeVisible();
 });
 
 test("shows a field error and keeps the input", async ({ page }) => {
-  const title = page.getByLabel("Title");
-  const description = page.getByLabel("Description");
+  const title = page.getByRole("textbox", { name: "Title" });
+  const description = page.getByRole("textbox", { name: "Description" });
 
   // Spaces pass the browser's `required` check, so only the server can reject them.
   await title.fill("   ");
@@ -52,6 +54,10 @@ test("shows a field error and keeps the input", async ({ page }) => {
   await expectPath(page, "/issues/new");
 
   await expect(description).toHaveValue("Keep me");
-  await expect(page.getByLabel("Status")).toContainText("Todo");
-  await expect(page.getByLabel("Priority")).toContainText("High");
+  await expect(page.getByRole("combobox", { name: "Status" })).toContainText(
+    "Todo",
+  );
+  await expect(page.getByRole("combobox", { name: "Priority" })).toContainText(
+    "High",
+  );
 });

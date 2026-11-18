@@ -57,7 +57,10 @@ export default async function EditWikiPage({
         </CardHeader>
 
         <CardContent>
+          {/* cacheComponents keeps this route mounted while hidden; a new updatedAt
+              remounts the form, so a reopened edit shows the saved values. */}
           <WikiPageForm
+            key={page.updatedAt.toISOString()}
             action={updateWikiPage.bind(null, page.id)}
             initialValues={{ title: page.title, body: page.body }}
             submitLabel="Save changes"

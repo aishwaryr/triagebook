@@ -28,9 +28,11 @@ test("edits an issue and shows the saved values", async ({ page }) => {
   await expectPath(page, `${issue.url}/edit`);
   await expect(page).toHaveTitle(`Edit ${issue.key} · Triagebook`);
 
-  await expect(page.getByLabel("Title")).toHaveValue(issue.title);
-  await page.getByLabel("Title").fill(newTitle);
-  await page.getByLabel("Description").fill("");
+  await expect(page.getByRole("textbox", { name: "Title" })).toHaveValue(
+    issue.title,
+  );
+  await page.getByRole("textbox", { name: "Title" }).fill(newTitle);
+  await page.getByRole("textbox", { name: "Description" }).fill("");
   await choose(page, "Status", "Done");
   await choose(page, "Priority", "Low");
   await page.getByRole("button", { name: "Save changes" }).click();
@@ -46,12 +48,12 @@ test("shows a field error and does not save", async ({ page }) => {
   const issue = await insertIssue(TITLE_PREFIX);
 
   await page.goto(`${issue.url}/edit`);
-  await page.getByLabel("Title").fill("   ");
+  await page.getByRole("textbox", { name: "Title" }).fill("   ");
   await page.getByRole("button", { name: "Save changes" }).click();
 
-  await expect(page.getByLabel("Title")).toHaveAccessibleDescription(
-    "Title is required",
-  );
+  await expect(
+    page.getByRole("textbox", { name: "Title" }),
+  ).toHaveAccessibleDescription("Title is required");
   await expectPath(page, `${issue.url}/edit`);
 
   await page.getByRole("link", { name: "Cancel" }).click();

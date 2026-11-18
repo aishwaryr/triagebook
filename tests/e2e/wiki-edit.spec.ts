@@ -23,10 +23,16 @@ test("edits a page and keeps its URL", async ({ page }) => {
   await expectPath(page, `${wikiPage.url}/edit`);
   await expect(page).toHaveTitle(new RegExp(`Edit ${wikiPage.title}`));
 
-  await expect(page.getByLabel("Title")).toHaveValue(wikiPage.title);
-  await expect(page.getByLabel("Content")).toHaveValue("Old text");
-  await page.getByLabel("Title").fill(newTitle);
-  await page.getByLabel("Content").fill("## New section\n\nNew text");
+  await expect(page.getByRole("textbox", { name: "Title" })).toHaveValue(
+    wikiPage.title,
+  );
+  await expect(page.getByRole("textbox", { name: "Content" })).toHaveValue(
+    "Old text",
+  );
+  await page.getByRole("textbox", { name: "Title" }).fill(newTitle);
+  await page
+    .getByRole("textbox", { name: "Content" })
+    .fill("## New section\n\nNew text");
   await page.getByRole("button", { name: "Save changes" }).click();
 
   // Same slug after a rename, so links to the page keep working.
@@ -35,14 +41,17 @@ test("edits a page and keeps its URL", async ({ page }) => {
   await expect(
     page.getByRole("heading", { level: 2, name: "New section" }),
   ).toBeVisible();
-  await expect(page.getByText("Old text")).toHaveCount(0);
+  // visible: the edit route stays mounted (hidden) and still holds the old body.
+  await expect(
+    page.getByText("Old text").filter({ visible: true }),
+  ).toHaveCount(0);
 });
 
 test("shows a field error and does not save", async ({ page }) => {
   const wikiPage = await insertWikiPage(TITLE_PREFIX);
 
   await page.goto(`${wikiPage.url}/edit`);
-  await page.getByLabel("Title").fill("   ");
+  await page.getByRole("textbox", { name: "Title" }).fill("   ");
   await page.getByRole("button", { name: "Save changes" }).click();
 
   await expect(page.getByText("Title is required")).toBeVisible();

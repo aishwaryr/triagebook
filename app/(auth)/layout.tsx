@@ -4,6 +4,9 @@ import { redirect } from "next/navigation";
 import { Brand } from "@/components/brand";
 import { getCurrentUser } from "@/lib/dal";
 
+/** Reads the session, so navigations into this group wait for the server (no static shell). */
+export const instant = false;
+
 // Already signed in? /signin and /signup have nothing to offer — send them home.
 export default async function AuthLayout({
   children,
