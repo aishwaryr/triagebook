@@ -1,10 +1,12 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { after } from "next/server";
 import { flattenError, z } from "zod";
 
 import { db } from "@/db";
-import { users } from "@/db/schema";
+import { demoVisits, users } from "@/db/schema";
 import { getUserByEmail } from "@/lib/dal";
 import { readForm } from "@/lib/form-data";
 import {
@@ -169,7 +171,23 @@ export async function signInAsDemo(): Promise<DemoSignInState> {
   }
 
   await createSession(user.id);
+  // Runs after the response is sent (even after redirect), so tracking never slows or breaks sign-in.
+  after(recordDemoVisit);
   redirect("/");
+}
+
+/** Logs one demo visit with Vercel's geo headers (city is URL-encoded; both are absent locally). */
+async function recordDemoVisit() {
+  try {
+    const h = await headers();
+    const city = h.get("x-vercel-ip-city");
+    await db.insert(demoVisits).values({
+      city: city ? decodeURIComponent(city) : null,
+      country: h.get("x-vercel-ip-country"),
+    });
+  } catch (error) {
+    console.error("Could not record a demo visit", error);
+  }
 }
 
 // ---------- sign-out ----------

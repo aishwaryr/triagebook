@@ -199,3 +199,21 @@ export const issueCommentsRelations = relations(issueComments, ({ one }) => ({
     references: [users.id],
   }),
 }));
+
+// Demo visits
+
+/** Type: one Try Demo sign-in — rough location and time, for usage tracking. No IP is stored. */
+export const demoVisits = pgTable(
+  "demo_visits",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    // From Vercel's geo headers; null locally and when Vercel can't place the IP.
+    city: varchar("city", { length: 120 }),
+    country: varchar("country", { length: 2 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  // The admin page lists newest first.
+  (table) => [index("demo_visits_created_at_idx").on(table.createdAt)],
+);
